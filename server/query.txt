@@ -1,0 +1,40 @@
+{
+  phones {
+      Name
+      Phone
+      id
+  }
+}
+  
+    
+mutation {
+  addContact(id: "01" ,Name: "green3", Phone: "02132103022213") {
+    id
+    Name
+    Phone
+   }
+}
+  
+mutation {
+   updateContact(id:"1598917884554" Name:"greenUpdate", Phone:"02132103022213") {
+    Phone
+    Name
+  }
+}
+    
+    
+mutation {
+  removeContact(id:"1598917884554") {
+    id   
+  }
+}
+
+{
+  phones(pagination: {offset: 1, limit: 2}) {
+    items {
+      id
+      Name
+      Phone
+    }
+  }
+}
