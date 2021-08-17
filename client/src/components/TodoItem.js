@@ -6,7 +6,7 @@ import { faTrashAlt, faReply, faPencilAlt } from '@fortawesome/free-solid-svg-ic
 export default function TodoItem(props) {
     return (
         <tr>
-            <td>{props.index}</td>
+            <th scope="row">{props.index}</th>
             <td>{props.name}</td>
             <td>{props.phone}</td>
             <td>

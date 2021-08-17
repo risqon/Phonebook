@@ -1,105 +1,94 @@
-// import React, { Component } from 'react';
-// import { connect } from 'react-redux';
-// import { loadPhone, nextPage, previousPage, changePage, searchContacts } from '../actions';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { loadPhone, nextPage, previousPage, searchPhones, switchPage } from '../actions';
 
-// class Pagination extends Component {
-//    constructor(props) {
+class Pagination extends Component {
 
-//       super(props);
-//       this.state = {
-//          limit: 3
-//       }
-//       this.handlePrevious = this.handlePrevious.bind(this);
-//       this.handleNext = this.handleNext.bind(this);
-//       this.handlePage = this.handlePage.bind(this);
-//    }
 
-//    handlePrevious(event) {
-//       const { limit } = this.state;
-//       let offset = ((this.props.page - 1) - 1) * limit
+   handleClick = (event) => {
+      const { currenPage, limit, searchName, searchPhone, isSearchModeOn } = this.state
+      if (event.target.name === "previousPage"){
+         const offset = (currenPage -2) * limit
 
-//       if (this.props.isSearch) {
-//          this.props.searchContacts(this.props.filterName, this.props.filterPhone, offset, limit);
-//       } else {
-//          this.props.loadPhones(offset);
-//       }
-//       this.props.previousPage();
-//       event.preventDefault();
-//    }
+         if(isSearchModeOn){
+            this.props.searchPhone(searchName, searchPhone, offset)
+         } else {
+            this.props.loadPhone(offset)
+         }
+         this.props.clickPrevPage(offset)
+      } else if (event.target.name === "nextPage"){
+         const offset = currenPage * limit 
 
-//    handleNext(event) {
-//       const { limit } = this.state;
-//       let offset = ((this.props.page + 1) - 1) * limit;
+         if(isSearchModeOn) {
+            this.props.searchPhone(searchName, searchPhone, offset)
+         } else {
+            this.props.loadPhone(offset)
+         }
+         this.props.clickNextPage(offset)
+      } else {
+         const offset = (event.target.id - 1) * limit
+         const swithcToPage = Number(event.target.id)
 
-//       if (this.props.isSearch) {
-//          this.props.searchContacts(this.props.filterName, this.props.filterPhone, offset, limit);
-//       } else {
-//          this.props.loadPhones(offset);
-//       }
-//       this.props.nextPage();
-//       event.preventDefault();
-//    }
+         if(isSearchModeOn) {
+            this.props.searchContacts(searchName, searchPhone, offset)
+         } else {
+            this.props.loadPhone(offset)
+         }
+         this.props.switchPage(offset, swithcToPage)
+      }
+      event.preventDefault()
+   }
 
-//    handlePage(event) {
-//       // console.log(event.target.id)
-//       // this.props.loadPhones(event.target.id);
-//       const { limit } = this.state;
-//       const page = event.target.id
-//       const offset = (page - 1) * this.state.limit;
 
-//       if (this.props.isSearch) {
-//          this.props.searchContacts(this.props.filterName, this.props.filterPhone, offset, limit);
-//       } else {
-//          this.props.loadPhones(page);
-//       }
-//       this.props.changePage(page);
-//       event.preventDefault();
-//    }
 
-//    render() {
-//       // console.log(this.props.changePage())
-//       return (
-//          <nav aria-label="Page navigation example" >
-//             <ul className="pagination justify-content-center">
+   render() {
+      const { currenPage, pages } = this.props.stateFromMaps
+      const iterator = []
 
-//                <li className={this.props.page === 1 ? "page-item disabled" : "page-item"}>
-//                   <a className="page-link" href="/#" onClick={this.handlePrevious}>Previous</a>
-//                </li>
+      for(let i = 0; i < pages; i++){
+         iterator.push(i)
+      }
 
-//                {
-//                [...Array(this.props.pages)].map((num, index) => {
-//                   return (<li className={this.props.page === index + 1 ? "page-item active" : "page-item"} key={index} ><a
-//                      className="page-link" id={index + 1} onClick={this.handlePage} href="/#" >{index + 1}</a></li>)
-//                })
-//                }
+      return (
+         <nav aria-label="Page navigation example" >
+            <ul className="pagination justify-content-center">
 
-//                <li className={this.props.page === this.props.pages ? "page-item disabled" : "page-item"}>
-//                   <a className="page-link" href="/#" onClick={this.handleNext}>Next</a>
-//                </li>
+               <li className={currenPage === 1 ? "page-item disabled" : "page-item"}>
+                  <button href="#" className="page-link" name="previousPage" value={currenPage - 1} onClick={this.handleClick}>Previous</button>
+               </li>
 
-//             </ul>
-//          </nav >
-//       )
-//    }
-// }
+               {
+                  iterator.map((e, index) => {
+                     return (
+                     <li className={currenPage === index + 1 ? "page-item active" : "page-item"} key={index + 1} >
+                        <button className="page-link" href="#" name="pagi" id={index + 1} onClick={this.handleClick} >{index + 1}</button>
+                     </li>)
+                  })
+               }
 
-// const mapStateToProps = (state) => ({
-//    page: state.phones.page,
-//    pages: state.phones.pages.pages,
-//    isSearch: state.phones.isSearch,
-//    filterName: state.phones.filterName,
-//    filterPhone: state.phones.filterPhone
-// })
+               <li className={currenPage === pages ? "page-item disabled" : "page-item"}>
+                  <button className="page-link" href="#" name="nextPage"  onClick={this.handleClick}>Next</button>
+               </li>
 
-// const mapDispatchToProps = dispatch => ({
-//    loadPhones: (offset, limit) => dispatch(loadPhone(offset, limit)),
-//    searchContacts: (name, phone, offset, limit) => (dispatch(searchContacts(name, phone, offset, limit))),
-//    changePage: (page) => dispatch(changePage(page)),
-//    nextPage: () => dispatch(nextPage()),
-//    previousPage: () => dispatch(previousPage())
-// })
+            </ul>
+         </nav >
+      )
+   }
+}
 
-// export default connect(
-//    mapStateToProps,
-//    mapDispatchToProps
-// )(Pagination)
+const mapStateToProps = ({ phones }) => ({
+   stateFromMaps: phones
+})
+
+const mapDispatchToProps = dispatch => ({
+   loadPhone: (offset) => dispatch(loadPhone(offset)),
+   searchContacts: (name, phone, offset) => (dispatch(searchPhones(name, phone, offset))),
+   previousPage: () => dispatch(previousPage()),
+   clickNextPage: (offset) => dispatch(nextPage(offset)),
+   clickPrevPage: (offset, swithcToPage) => dispatch(switchPage(offset, swithcToPage))
+})
+
+export default connect(
+   mapStateToProps,
+   mapDispatchToProps
+)(Pagination)

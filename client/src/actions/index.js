@@ -1,11 +1,10 @@
-import axios from 'axios'
 import ApolloClient from 'apollo-boost'
 import gql from 'graphql-tag'
 
 const API_URL = 'http://localhost:3001/graphql'
 
 const client = new ApolloClient({
-    uri : API_URL
+    uri: API_URL
 })
 
 
@@ -20,10 +19,10 @@ const loadPhoneFailure = () => ({
     type: 'LOAD_PHONE_FAILURE'
 })
 
-export const loadPhone = (offset = 0 , limit = 5) => {
+export const loadPhone = (offset = 0, limit = 5) => {
     const usersQuery = gql`
     query{
-        phones(pagination:{offser: ${offset}, limit:${limit}}){
+        phones(pagination:{offset: ${offset}, limit:${limit}}){
             totalData
             items{
                 id,
@@ -33,64 +32,67 @@ export const loadPhone = (offset = 0 , limit = 5) => {
         }
     }`
     return dispatch => {
-       return client.query({
-           query: usersQuery,
-       }).then( function(response) {
-           dispatch(loadPhoneSuccess(response.data.phones))
-       }).catch(function(error) {
-           console.error(error);
-           dispatch(loadPhoneFailure())
-       })
+        return client.query({
+            query: usersQuery,
+        }).then(function (response) {
+            dispatch(loadPhoneSuccess(response.data.phones.items))
+            
+        }).catch(function (error) {
+            console.error(error);
+            dispatch(loadPhoneFailure())
+        })
     }
 }
 
 //end load phone data
 
-// start search phone data
-export const searchContacts = (name, phone, offset = 0, limit = 3) => {
-    console.log('risqon', name, phone)
-    return dispatch => {
-
-        return request.get(`phones/${name}/${phone}`)
-            .then(function (response) {
-                console.log('test', response.data)
-                let isiPage = response.data[response.data.length - 1]
-                response.data.pop()
-                console.log(isiPage)
-                dispatch(loadPhoneSuccess(response.data, isiPage))
-            })
-            .catch(function (error) {
-                console.log(error);
-                dispatch(loadPhoneFailure)
-            })
-    }
-
-}
-
-
-// end search phone data
 
 // on search 
-export const onSearch = (filter) => ({
-    type: 'ON_SEARCH', filter
+export const searchMode = (filter) => ({
+    type: 'MODE_SEARCH_ACTIVE',
+    filter
 })
 
-//PAGINATION ACTIONS START
-
-export const previousPage = () => ({
-    type: 'PREVIOUS_PAGE'
+export const cancelSearch = (filter) => ({
+    type: "MODE_SEARCH_INACTIVE",
+    filter
 })
 
-export const changePage = (page) => ({
-    type: 'CHANGE_PAGE',
-    page
-})
+export const searchPhones = (name, phone, offset = 0, limit = 5) => {
+    const searchQuery = gql`
+    query phones($name:String,$phone:String,$offset:Int,$limit:Int){
+        phones(name:$name,phone:$phone,pagination:{
+            offset:$offset,
+            limit:$limit
+        }) {
+            totalData
+            items{
+                id
+                Name
+                Phone
+            }
+        }
+    }`
+    return dispatch => {
+        return client.query({
+            query: searchQuery,
+            variables: {
+                name,
+                phone,
+                offset,
+                limit
+            }
+        })
+            .then(response => {
+                dispatch(loadPhoneSuccess(response.data.phones))
+            })
+            .catch(error => {
+                console.log(error)
+                dispatch(loadPhoneFailure())
+            })
+    }
+}
 
-export const nextPage = () => ({
-    type: 'NEXT_PAGE'
-})
-
-//PAGINATION ACTIONS END
 
 // start post phone data
 
@@ -103,19 +105,34 @@ const postPhoneFailure = (id) => ({
     type: 'POST_PHONE_FAILURE', id
 })
 
-const postPhoneRedux = (id, name, phone) => ({
-    type: 'POST_PHONE', id, name, phone
+const postPhoneRedux = (id, Name, Phone) => ({
+    type: 'POST_PHONE', id, Name, Phone
 })
 
-
-export const postPhone = (name, phone) => {
+ 
+export const postPhone = (Name, Phone) => {
     let id = Date.now();
+    const addQuery = gql`
+    mutation addContact($Name: String!, $Phone: String!,$id:ID!) {
+        addContact(Name: $Name, Phone: $Phone,id:$id) {
+            Name
+            Phone
+            id
+        }
+    }`
     return dispatch => {
-        dispatch(postPhoneRedux(id, name, phone))
-        return request.post('phones', { id, name, phone })
+        dispatch(postPhoneRedux(id, Name, Phone))
+        return client.mutate({ 
+            mutation: addQuery,
+            variables: {
+                Name,
+                Phone,
+                id
+            }
+        })
             .then(function (response) {
-                dispatch(postPhoneSuccess(response.data))
-                dispatch(loadPhone(1))
+                console.log(response)
+                dispatch(postPhoneSuccess(response.data.addContact))
             })
             .catch(function (error) {
                 console.error(error);
@@ -127,7 +144,8 @@ export const postPhone = (name, phone) => {
 // start delete phone data
 
 const deletePhoneRedux = (id) => ({
-    type: 'DELETE_PHONE', id
+    type: 'DELETE_PHONE',
+    id
 })
 
 const deletePhoneSuccess = (id) => ({
@@ -141,12 +159,23 @@ const deletePhoneFailure = () => ({
 
 
 export const deletePhone = (id) => {
+    const deleteQuery = gql`
+    mutation removeContact($id: ID!) {
+        removeContact(id: $id){
+            id
+        }
+    }`;
+
     return dispatch => {
         dispatch(deletePhoneRedux(id))
-        return request.delete(`phones/${id}`)
+        return client.mutate({
+            mutation: deleteQuery,
+            variables: {
+                id
+            }
+        })
             .then(function (response) {
                 dispatch(deletePhoneSuccess(response.data))
-                dispatch(loadPhone())
             })
             .catch(function (error) {
                 console.error(error);
@@ -160,13 +189,28 @@ export const deletePhone = (id) => {
 // start resend phone data
 
 const resendChatSuccess = (id) => ({
-    type: 'RESEND_CHAT_SUCCESS', id
+    type: 'RESEND_CHAT_SUCCESS',
+    id
 })
 
 
-export const resendPhone = (id, name, phone) => {
+export const resendPhone = (id, Name, Phone) => {
+    const addQuery = gql`
+    mutation addContact($Phone: String!, $Name: String!, $id:ID!){
+        addContact(Phone: $Phone, Name: $Name, id: $id){
+            Phone
+            Name
+        }
+    }`
     return dispatch => {
-        return request.post('phones', { id, name, phone })
+        return client.mutate({
+            mutation: addQuery,
+            variables: {
+                Phone,
+                Name,
+                id
+            }
+        })
             .then(function (response) {
                 dispatch(resendChatSuccess(id))
             })
@@ -180,6 +224,17 @@ export const resendPhone = (id, name, phone) => {
 
 // start edit phone data
 
+const togleThisButton = (id) => ({
+    type: 'TOGLE',
+    id
+})
+
+export const togleButtonCta = (id) => {
+    return dispatch => {
+        dispatch(togleThisButton(id))
+    }
+}
+
 const clickEdit = (id) => ({
     type: 'EDIT_CLICK',
     id
@@ -191,45 +246,87 @@ export const clickEditAct = (id) => {
     }
 }
 
-const clickCancel = (id) => ({
+const cancelEdit = (id) => ({
+    type: 'EDIT_CLICK_CANCEL',
+    id
+})
+
+export const clickCancel = (id) => ({
     type: 'CANCEL_CLICK',
     id
 })
 
 export const clickCancelEditAct = (id) => {
     return dispatch => {
-        dispatch(clickCancel(id))
+        dispatch(cancelEdit(id))
     }
 }
 
 
-const putPhoneSuccess = (id, name, phone) => ({
-    type: 'PUT_PHONE_SUCCESS',
-    id, name, phone
+const updatePhoneSuccess = (phone) => ({
+    type: 'UPDATE_PHONE_SUCCESS',
+    phone
 })
 
-const putPhoneFailure = (id) => ({
-    type: 'PUT_PHONE_FAILURE', id
+const updatePhoneFailure = (id) => ({
+    type: 'UPDATE_PHONE_FAILURE',
+     id
 })
 
-const putPhoneRedux = (id, name, phone) => ({
-    type: 'PUT_PHONE', id, name, phone
+const updatePhoneRedux = (id, Name, Phone) => ({
+    type: 'UPDATE_PHONE',
+     id, 
+     Name, 
+     Phone
 })
 
 
-export const editUpdatePhone = (id, name, phone) => {
+export const editUpdatePhone = (id, Name, Phone) => {
+    const updateQuery = gql`
+    mutation updateContact($Phone: String!, $Name: String!, $id: ID!){
+        updateContact(Phone: $Phone, Name:$Name, id:$id){
+            Phone
+            Name
+            id
+        }
+    }`
+
     return dispatch => {
-        dispatch(putPhoneRedux(id, name, phone))
-        return request.put(`phones/${id}`, { name, phone })
+        dispatch(updatePhoneRedux(id, Name, Phone))
+        return client.mutate({
+            mutation: updateQuery,
+            variables:{
+                Phone,
+                Name,
+                id
+            }
+        })
             .then(function (response) {
-                dispatch(putPhoneSuccess(response.data))
+                dispatch(updatePhoneSuccess(response.data))
             })
             .catch(function (error) {
                 console.error(error);
-                dispatch(putPhoneFailure(id))
+                dispatch(updatePhoneFailure(id))
             });
     }
 }
+
+
+export const nextPage = (offset) => ({
+    type: "NEXT_PAGE",
+    offset
+})
+
+export const previousPage = (offset) => ({
+    type: "PREVIOOUS_PAGE",
+    offset
+})
+
+export const switchPage = (offset, switchToPage) => ({
+    type: "SWITCH_PAGE",
+    offset,
+    switchToPage
+})
 
 
 //end edit phone data
