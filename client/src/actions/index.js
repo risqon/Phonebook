@@ -9,17 +9,17 @@ const client = new ApolloClient({
 
 
 // start load phone data
-const loadPhoneSuccess = (phones, totalData) => ({
+export const loadPhoneSuccess = ({totalData, items}) => ({
     type: 'LOAD_PHONE_SUCCESS',
     totalData,
-    phones
+    items
 })
 
-const loadPhoneFailure = () => ({
+export const loadPhoneFailure = () => ({
     type: 'LOAD_PHONE_FAILURE'
 })
 
-export const loadPhone = (offset = 0, limit = 5) => {
+export const loadPhone = (offset = 0, limit = 3) => {
     const usersQuery = gql`
     query{
         phones(pagination:{offset: ${offset}, limit:${limit}}){
@@ -35,8 +35,8 @@ export const loadPhone = (offset = 0, limit = 5) => {
         return client.query({
             query: usersQuery,
         }).then(function (response) {
-            dispatch(loadPhoneSuccess(response.data.phones.items))
-            
+            console.log(response.data)
+            dispatch(loadPhoneSuccess(response.data.phones))
         }).catch(function (error) {
             console.error(error);
             dispatch(loadPhoneFailure())
@@ -53,15 +53,14 @@ export const searchMode = (filter) => ({
     filter
 })
 
-export const cancelSearch = (filter) => ({
+export const cancelSearch = () => ({
     type: "MODE_SEARCH_INACTIVE",
-    filter
 })
 
-export const searchPhones = (name, phone, offset = 0, limit = 5) => {
+export const searchPhones = (Name, Phone, offset = 0, limit = 3) => {
     const searchQuery = gql`
-    query phones($name:String,$phone:String,$offset:Int,$limit:Int){
-        phones(name:$name,phone:$phone,pagination:{
+    query phones($Name:String,$Phone:String,$offset:Int,$limit:Int){
+        phones(Name:$Name,Phone:$Phone,pagination:{
             offset:$offset,
             limit:$limit
         }) {
@@ -77,8 +76,8 @@ export const searchPhones = (name, phone, offset = 0, limit = 5) => {
         return client.query({
             query: searchQuery,
             variables: {
-                name,
-                phone,
+                Name,
+                Phone,
                 offset,
                 limit
             }
@@ -96,16 +95,16 @@ export const searchPhones = (name, phone, offset = 0, limit = 5) => {
 
 // start post phone data
 
-const postPhoneSuccess = (phones) => ({
+export const postPhoneSuccess = (phones) => ({
     type: 'POST_PHONE_SUCCESS',
     phones
 })
 
-const postPhoneFailure = (id) => ({
+export const postPhoneFailure = (id) => ({
     type: 'POST_PHONE_FAILURE', id
 })
 
-const postPhoneRedux = (id, Name, Phone) => ({
+export const postPhoneRedux = (id, Name, Phone) => ({
     type: 'POST_PHONE', id, Name, Phone
 })
 
@@ -143,17 +142,17 @@ export const postPhone = (Name, Phone) => {
 
 // start delete phone data
 
-const deletePhoneRedux = (id) => ({
+export const deletePhoneRedux = (id) => ({
     type: 'DELETE_PHONE',
     id
 })
 
-const deletePhoneSuccess = (id) => ({
+export const deletePhoneSuccess = (id) => ({
     type: 'DELETE_PHONE_SUCCESS',
     id
 })
 
-const deletePhoneFailure = () => ({
+export const deletePhoneFailure = () => ({
     type: 'DELETE_PHONE_FAILURE'
 })
 
@@ -188,7 +187,7 @@ export const deletePhone = (id) => {
 
 // start resend phone data
 
-const resendChatSuccess = (id) => ({
+export const resendChatSuccess = (id) => ({
     type: 'RESEND_CHAT_SUCCESS',
     id
 })
@@ -224,18 +223,18 @@ export const resendPhone = (id, Name, Phone) => {
 
 // start edit phone data
 
-const togleThisButton = (id) => ({
+export const togleThisButton = (id) => ({
     type: 'TOGLE',
     id
 })
 
-export const togleButtonCta = (id) => {
+export const TogleButtonCta = () => {
     return dispatch => {
-        dispatch(togleThisButton(id))
+        dispatch(togleThisButton())
     }
 }
 
-const clickEdit = (id) => ({
+export const clickEdit = (id) => ({
     type: 'EDIT_CLICK',
     id
 })
@@ -246,7 +245,7 @@ export const clickEditAct = (id) => {
     }
 }
 
-const cancelEdit = (id) => ({
+export const cancelEdit = (id) => ({
     type: 'EDIT_CLICK_CANCEL',
     id
 })
@@ -263,17 +262,17 @@ export const clickCancelEditAct = (id) => {
 }
 
 
-const updatePhoneSuccess = (phone) => ({
+export const updatePhoneSuccess = (phone) => ({
     type: 'UPDATE_PHONE_SUCCESS',
     phone
 })
 
-const updatePhoneFailure = (id) => ({
+export const updatePhoneFailure = (id) => ({
     type: 'UPDATE_PHONE_FAILURE',
      id
 })
 
-const updatePhoneRedux = (id, Name, Phone) => ({
+export const updatePhoneRedux = (id, Name, Phone) => ({
     type: 'UPDATE_PHONE',
      id, 
      Name, 
@@ -314,12 +313,12 @@ export const editUpdatePhone = (id, Name, Phone) => {
 
 export const nextPage = (offset) => ({
     type: "NEXT_PAGE",
-    offset
+    offset,
 })
 
 export const previousPage = (offset) => ({
-    type: "PREVIOOUS_PAGE",
-    offset
+    type: "PREVIOUS_PAGE",
+    offset,
 })
 
 export const switchPage = (offset, switchToPage) => ({

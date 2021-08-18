@@ -18,7 +18,20 @@ body {
 .jumbotron{
   color: white;
   background-color: rgba(0, 0,0,0.6);
-  
+  margin-bottom: 10px;
+}
+
+.jumbotron h1{
+  font-family: 'Poppins', sans-serif;
+}
+
+.card{
+  border-radius: 25px;
+}
+
+.main-container {
+  border-radius: 25px;
+  overflow: hidden;
 }
 
 code {

@@ -33,8 +33,8 @@ class TodoList extends Component {
                         id={item.id}
                         index={this.props.stateFromMaps.offset + index +1}
                         sent={item.sent}
-                        name={item.Name}
-                        phone={item.Phone}
+                        Name={item.Name}
+                        Phone={item.Phone}
                         edit={item.isEdit}
                     />)
         })
@@ -42,11 +42,12 @@ class TodoList extends Component {
         return (
            
             <div>
-                <table className="table table-striped table-light centering  table-hover">
+                <table className="table border-radius table-striped table-light centering  table-hover">
                     <thead className="thead-dark">
                         <tr>
                             <th scope="col">#</th>
-                            <th scope="col">Nama</th>
+                            <th scope="col">Pict</th>
+                            <th scope="col">Name</th>
                             <th scope="col">Phone</th>
                             <th scope="col">Action</th>
                         </tr>

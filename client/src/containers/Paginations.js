@@ -6,72 +6,71 @@ class Pagination extends Component {
 
 
    handleClick = (event) => {
-      const { currenPage, limit, searchName, searchPhone, isSearchModeOn } = this.state
-      if (event.target.name === "previousPage"){
-         const offset = (currenPage -2) * limit
+      const { currentPage, limit, searchName, searchPhone, isSearchModeOn } = this.props.stateFromMaps
+      if (event.target.name === "previousPage") {
+         const offset = (currentPage - 2) * limit
 
-         if(isSearchModeOn){
-            this.props.searchPhone(searchName, searchPhone, offset)
+         if (isSearchModeOn) {
+             this.props.searchPhones(searchName, searchPhone, offset)
          } else {
-            this.props.loadPhone(offset)
+             this.props.loadPhone(offset)
          }
          this.props.clickPrevPage(offset)
-      } else if (event.target.name === "nextPage"){
-         const offset = currenPage * limit 
 
-         if(isSearchModeOn) {
-            this.props.searchPhone(searchName, searchPhone, offset)
+     } else if (event.target.name === "nextPage") {
+         const offset = currentPage * limit
+
+         if (isSearchModeOn) {
+             this.props.searchPhones(searchName, searchPhone, offset)
          } else {
-            this.props.loadPhone(offset)
+             this.props.loadPhone(offset)
          }
          this.props.clickNextPage(offset)
-      } else {
+     } else {
          const offset = (event.target.id - 1) * limit
-         const swithcToPage = Number(event.target.id)
+         const switchToPage = Number(event.target.id)
 
-         if(isSearchModeOn) {
-            this.props.searchContacts(searchName, searchPhone, offset)
+         if (isSearchModeOn) {
+             this.props.searchPhones(searchName, searchPhone, offset)
          } else {
-            this.props.loadPhone(offset)
+             this.props.loadPhone(offset)
          }
-         this.props.switchPage(offset, swithcToPage)
-      }
+         this.props.switchPage(offset, switchToPage)
+
+     }
       event.preventDefault()
    }
 
 
 
    render() {
-      const { currenPage, pages } = this.props.stateFromMaps
+      const { currentPage, pages } = this.props.stateFromMaps
       const iterator = []
 
-      for(let i = 0; i < pages; i++){
+      for (let i = 0; i < pages; i++) {
          iterator.push(i)
       }
 
       return (
-         <nav aria-label="Page navigation example" >
-            <ul className="pagination justify-content-center">
-
-               <li className={currenPage === 1 ? "page-item disabled" : "page-item"}>
-                  <button href="#" className="page-link" name="previousPage" value={currenPage - 1} onClick={this.handleClick}>Previous</button>
-               </li>
-
-               {
-                  iterator.map((e, index) => {
+         <div id="pagination">
+            <nav aria-label="..." >
+               <ul className="pagination justify-content-center">
+                  <li className={currentPage === 1 ? "page-item disabled" : "page-item"}>
+                     <button href="#" className="page-link" name="previousPage" value={currentPage - 1} onClick={this.handleClick}>Previous</button>
+                  </li>
+                  {iterator.map((e, index) => {
                      return (
-                     <li className={currenPage === index + 1 ? "page-item active" : "page-item"} key={index + 1} >
-                        <button className="page-link" href="#" name="pagi" id={index + 1} onClick={this.handleClick} >{index + 1}</button>
-                     </li>)
-                  })
-               }
+                        <li className={currentPage === index + 1 ? "page-item active" : "page-item"} key={index + 1} >
+                           <button className="page-link" href="#" name="pagi" id={index + 1} onClick={this.handleClick} >{index + 1}</button>
+                        </li>)
+                  })}
+                  <li className={currentPage === pages ? "page-item disabled" : "page-item"}>
+                     <button className="page-link" href="#" name="nextPage" onClick={this.handleClick}>Next</button>
+                  </li>
+               </ul>
+            </nav >
+         </div>
 
-               <li className={currenPage === pages ? "page-item disabled" : "page-item"}>
-                  <button className="page-link" href="#" name="nextPage"  onClick={this.handleClick}>Next</button>
-               </li>
-
-            </ul>
-         </nav >
       )
    }
 }
@@ -82,10 +81,10 @@ const mapStateToProps = ({ phones }) => ({
 
 const mapDispatchToProps = dispatch => ({
    loadPhone: (offset) => dispatch(loadPhone(offset)),
-   searchContacts: (name, phone, offset) => (dispatch(searchPhones(name, phone, offset))),
-   previousPage: () => dispatch(previousPage()),
-   clickNextPage: (offset) => dispatch(nextPage(offset)),
-   clickPrevPage: (offset, swithcToPage) => dispatch(switchPage(offset, swithcToPage))
+   searchPhones: (Name, Phone, offset) => (dispatch(searchPhones(Name, Phone, offset))),
+   clickNextPage: (offset ) => dispatch(nextPage(offset)),
+   clickPrevPage: (offset) => dispatch(previousPage(offset)),
+   switchPage: (offset, switchToPage) => dispatch(switchPage(offset, switchToPage))
 })
 
 export default connect(

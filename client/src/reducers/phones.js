@@ -2,6 +2,7 @@ let globalState = {
     phones: [],
     isActive: false,
     pages: 0,
+    limit: 3,
     offset: 0,
     currentPage: 1,
     isSearchModeOn: false,
@@ -12,17 +13,17 @@ let globalState = {
 const phones = (state = globalState, action) => {
     switch (action.type) {
         case 'LOAD_PHONE_SUCCESS':
-          
+
             return {
                 ...state,
-                phones: action.phones.map((item) => {
+                phones: action.items.map((item) => {
                     item.sent = true
                     item.isEdit = false
                     return item
                 }),
-                
+
                 pages: Number(Math.ceil(action.totalData / state.limit)),
-                totalDataL: Number(action.totalData),
+                totalData: Number(action.totalData),
             }
 
         case 'MODE_SEARCH_ACTIVE':
@@ -30,8 +31,8 @@ const phones = (state = globalState, action) => {
 
                 ...state,
                 isSearchModeOn: true,
-                filterName: "",
-                filterPhone: ""
+                filterName: action.filter.Name,
+                filterPhone: action.filter.Phone
             }
 
         case 'MODE_SEARCH_INACTIVE':
@@ -40,13 +41,13 @@ const phones = (state = globalState, action) => {
                 isSearchModeOn: false,
                 filterName: "",
                 filterPhone: ""
-            }    
+            }
 
 
         case 'NEXT_PAGE':
             return {
                 ...state,
-                currentPage : state.currentPage + 1,
+                currentPage: state.currentPage + 1,
                 offset: action.offset
             }
 
@@ -56,13 +57,20 @@ const phones = (state = globalState, action) => {
                 currentPage: state.currentPage - 1,
                 offset: action.offset
             }
- 
+
+        case 'SWITCH_PAGE':
+            return {
+                ...state,
+                currentPage: action.switchToPage,
+                offset: action.offset
+            }
+
         case 'POST_PHONE':
             return {
                 ...state,
                 phones: [
                     ...state.phones, {
-                        Id: action.id,
+                        id: action.id,
                         Name: action.Name,
                         Phone: action.Phone,
                         sent: true,
@@ -89,7 +97,7 @@ const phones = (state = globalState, action) => {
 
         case 'RESEND_CHAT_SUCCESS':
             return {
-                ...state, 
+                ...state,
                 phones: state.phones.map(item => {
                     if (item.id === action.id) {
                         item.sent = true;
@@ -102,12 +110,12 @@ const phones = (state = globalState, action) => {
             return {
                 ...state,
                 isActive: !state.isActive
-            }    
+            }
 
         case 'EDIT_CLICK':
             return {
                 ...state,
-                 phones: state.phones.map(item => {
+                phones: state.phones.map(item => {
                     if (item.id === action.id) {
                         item.isEdit = true
                     }
@@ -117,7 +125,7 @@ const phones = (state = globalState, action) => {
 
         case 'EDIT_CLICK_CANCEL':
             return {
-                ...state, 
+                ...state,
                 phones: state.phones.map(item => {
                     if (item.id === action.id) {
                         item.isEdit = false
@@ -128,7 +136,7 @@ const phones = (state = globalState, action) => {
 
         case 'UPDATE_PHONE':
             return {
-                ...state, 
+                ...state,
                 phones: state.phones.map(item => {
                     if (item.id === action.id) {
                         item.Name = action.Name
@@ -144,7 +152,7 @@ const phones = (state = globalState, action) => {
 
         case 'UPDATE_PHONE_FAILURE':
             return {
-                ...state, 
+                ...state,
                 phones: state.phones.map((item) => {
                     if (item.id === action.id) {
                         item.isEdit = false
@@ -155,9 +163,9 @@ const phones = (state = globalState, action) => {
 
         case 'DELETE_PHONE':
             return {
-                ...state, 
-                phones: state.phones.filter((item) => 
-                item.id !== action.id)
+                ...state,
+                phones: state.phones.filter((item) =>
+                    item.id !== action.id)
             }
 
         case 'DELETE_PHONE_SUCCESS':
