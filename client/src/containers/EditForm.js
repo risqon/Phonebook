@@ -9,8 +9,8 @@ class TodoEdit extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            Name: this.props.Name, 
-            Phone: this.props.Phone 
+            name: this.props.name, 
+            phone: this.props.phone 
         }
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -24,8 +24,9 @@ class TodoEdit extends React.Component {
 
     handleSubmit(event) {
         this.props.update(
-        this.state.Name, 
-        this.state.Phone);
+        this.state.name, 
+        this.state.phone,
+        this.state.avatar);
         event.preventDefault();
     }
 
@@ -41,12 +42,12 @@ class TodoEdit extends React.Component {
                 </td>
                 <td>
                     <div className=" form-row" onSubmit={this.handleSubmit}>
-                        <input name="Name" type="text" className="form-control" value={this.state.Name} onChange={this.handleChange} required={true} />
+                        <input name="name" type="text" className="form-control" value={this.state.name} onChange={this.handleChange} required={true} />
                     </div>
                 </td>
                 <td>
                     <div className=" form-row" onSubmit={this.handleSubmit}>
-                        <input name="Phone" type="text" className="form-control" value={this.state.Phone} onChange={this.handleChange} required={true}/>
+                        <input name="phone" type="text" className="form-control" value={this.state.phone} onChange={this.handleChange} required={true}/>
                     </div>
                 </td>
                 <td>
@@ -61,7 +62,7 @@ class TodoEdit extends React.Component {
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
     cancelEdit: () => dispatch(clickCancelEditAct(ownProps.id)),
-    update: (Name, Phone) => dispatch(editUpdatePhone(ownProps.id, Name, Phone))
+    update: (name, phone, avatar) => dispatch(editUpdatePhone(ownProps.id, name, phone, avatar))
   })
   
   export default connect(

@@ -1,5 +1,5 @@
 
-const {GraphQLObjectType,GraphQLNonNull,GraphQLID,GraphQLString} =require('graphql')
+const { GraphQLObjectType, GraphQLNonNull, GraphQLID, GraphQLString } = require('graphql')
 
 // Phone Type
 // at this file we make a re-schema for our db
@@ -10,10 +10,13 @@ exports.phoneType = new GraphQLObjectType({
       id: {
         type: new GraphQLNonNull(GraphQLID)
       },
-      Name: {
+      name: {
         type: GraphQLString
       },
-      Phone: {
+      phone: {
+        type: GraphQLString
+      },
+      avatar: {
         type: GraphQLString
       }
     }

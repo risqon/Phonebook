@@ -6,8 +6,8 @@ class SearchForm extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            Name: "",
-            Phone: ""
+            name: "",
+            phone: ""
         }
         this.handlePhoneChange = this.handlePhoneChange.bind(this);
         this.handleNameChange = this.handleNameChange.bind(this);
@@ -15,22 +15,22 @@ class SearchForm extends Component {
     }
 
     handleNameChange(event) {
-        this.setState({ Name: event.target.value });
-        this.props.searchPhones(event.target.value, this.state.Phone)
-        this.props.searchMode({ Name: event.target.value, Phone: this.state.Phone })
+        this.setState({ name: event.target.value });
+        this.props.searchPhones(event.target.value, this.state.phone)
+        this.props.searchMode({ name: event.target.value, phone: this.state.phone })
     }
 
     handlePhoneChange(event) {
-        this.setState({ Phone: event.target.value });
-        this.props.searchPhones(this.state.Name, event.target.value)
-        this.props.searchMode({ Name: this.state.Name, Phone: event.target.value })
+        this.setState({ phone: event.target.value });
+        this.props.searchPhones(this.state.name, event.target.value)
+        this.props.searchMode({ name: this.state.name, phone: event.target.value })
     }
 
     
     handleClick(event) {
         this.props.loadPhone()
         this.props.cancelSearch()
-        this.setState({ Name: "", Phone: "" });
+        this.setState({ name: "", nhone: "" });
         event.preventDefault()
 
     }
@@ -46,13 +46,13 @@ class SearchForm extends Component {
                         <div className="form-group row">
                             <label htmlFor="Phone" className="col-sm-2 col-form-label">Name</label>
                             <div className="col-sm-10">
-                                <input type="text" className="form-control" id="Name" name="Name" value={this.state.Name} onChange={this.handleNameChange} placeholder="Search Name" />
+                                <input type="text" className="form-control" id="name" name="names" value={this.state.name} onChange={this.handleNameChange} placeholder="Search Name" />
                             </div>
                         </div>
                         <div className="form-group row">
                             <label htmlFor="Name" className="col-sm-2 col-form-label">Number</label>
                             <div className="col-sm-10">
-                                <input type="text" className="form-control" id="Phone" name="Phone" value={this.state.Phone} onChange={this.handlePhoneChange} placeholder="Search Phone Number" />
+                                <input type="text" className="form-control" id="phone" name="phones" value={this.state.phone} onChange={this.handlePhoneChange} placeholder="Search Phone Number" />
                             </div>
                             
                         </div>
@@ -72,8 +72,8 @@ class SearchForm extends Component {
 }
 
 const mapDispatchToProps = dispatch => ({
-    postPhone: (Phone, Name, id) => dispatch(postPhone(Phone, Name, id)),
-    searchPhones: (Name, Phone) => dispatch(searchPhones(Name, Phone)),
+    postPhone: (phone, name, id, avatar) => dispatch(postPhone(phone, name, id, avatar)),
+    searchPhones: (name, phone) => dispatch(searchPhones(name, phone)),
     searchMode: (filter) => dispatch(searchMode(filter)),
     loadPhone: () => dispatch(loadPhone()),
     cancelSearch:()=>dispatch(cancelSearch())

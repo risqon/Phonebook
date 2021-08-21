@@ -1,21 +1,29 @@
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
-var logger = require('morgan');const firebase = require("firebase");
+var logger = require('morgan');
 const bodyParser = require('body-parser');
 const { graphqlHTTP } = require("express-graphql");
 const cors = require("cors");
+const firebase = require("firebase/app")
+require("firebase/storage")
 
-const config = {
-    apiKey: "AIzaSyCVkPkEdvxEYm9aknhtBSgOx_k_uDlbf4Q",
-    authDomain: "risqon-2e358.firebaseapp.com",
-    databaseURL: "https://risqon-2e358.firebaseio.com/",
-    projectId: "risqon-2e358",
-    storageBucket: "risqon-2e358.appspot.com",
-    messagingSenderId: "913658410853"
+const firebaseConfig = {
+    apiKey: "AIzaSyBj0_0wxWy13mKTdOcGk891fY4emdZ6JgI",
+    authDomain: "phonebook-313.firebaseapp.com",
+    databaseURL: "https://phonebook-313-default-rtdb.firebaseio.com",
+    projectId: "phonebook-313",
+    storageBucket: "phonebook-313.appspot.com",
+    messagingSenderId: "287680863787",
+    appId: "1:287680863787:web:b3f0cae934bbb60b65146e",
+    measurementId: "G-TLX7CGXJM3"
 };
-firebase.initializeApp(config);
-//console.log(config,'conek firebise')
+
+firebase.initializeApp(firebaseConfig);
+
+const storage = firebase.storage();
+
+//exports{ storage, firebase as default };
 
 var indexRouter = require('./routes/index');
 

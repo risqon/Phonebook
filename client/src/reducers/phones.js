@@ -31,8 +31,8 @@ const phones = (state = globalState, action) => {
 
                 ...state,
                 isSearchModeOn: true,
-                filterName: action.filter.Name,
-                filterPhone: action.filter.Phone
+                filterName: action.filter.name,
+                filterPhone: action.filter.phone
             }
 
         case 'MODE_SEARCH_INACTIVE':
@@ -71,8 +71,9 @@ const phones = (state = globalState, action) => {
                 phones: [
                     ...state.phones, {
                         id: action.id,
-                        Name: action.Name,
-                        Phone: action.Phone,
+                        name: action.name,
+                        phone: action.phone,
+                        avatar: action.avatar,
                         sent: true,
                         isEdit: false
                     }
@@ -139,8 +140,9 @@ const phones = (state = globalState, action) => {
                 ...state,
                 phones: state.phones.map(item => {
                     if (item.id === action.id) {
-                        item.Name = action.Name
-                        item.Phone = action.Phone
+                        item.name = action.name
+                        item.phone = action.phone
+                        item.avatar = action.avatar
                         item.isEdit = false
                     }
                     return item

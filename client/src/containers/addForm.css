@@ -1,0 +1,39 @@
+.container{
+    margin-bottom: 3rem;
+}
+  
+.img-holder{
+    margin: auto;
+    width: 150px;
+    height: 150px;
+   
+    border-radius: 5px;
+    margin-top: 1rem;
+  }
+.img{
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 50rem;
+  }
+
+  #input[type="file"] {
+      display: none;
+  }
+.label{
+    width: 100%;
+    margin-top: 1rem;
+    display: flex;
+    justify-content: center;
+  }
+  
+.image-upload{
+    margin: auto;
+    width: 200px;
+    height: 30px;
+    color: white;
+    border-radius: 10px;
+    background-color:darkturquoise;
+    text-align: center;
+    cursor: pointer;
+  }

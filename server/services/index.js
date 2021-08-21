@@ -1,4 +1,6 @@
 const firebase = require("firebase");
+const { url } = require("inspector");
+const storage = firebase.storage()
 
 const getPhones = ( offset, limit) => {
   const phoneReference = firebase.database().ref("/Phones/");
@@ -22,10 +24,10 @@ const getPhones = ( offset, limit) => {
 }
 
 //search existing instance
-const searchPhones = (Name, Phone, offset, limit) => {
+const searchPhones = (name, phone, offset, limit) => {
   
-  const regName = new RegExp(Name, 'ig')
-  const regPhone = new RegExp(Phone, 'g')
+  const regName = new RegExp(name, 'ig')
+  const regPhone = new RegExp(phone, 'g')
   const phoneReference = firebase.database().ref("/Phones/");
 
   return (new Promise((resolve, reject) => {
@@ -37,12 +39,12 @@ const searchPhones = (Name, Phone, offset, limit) => {
         resolve([]);
       } else {
         const row = Object.keys(folders).map(o => Object.assign({id: o}, folders[o])).filter(item => {
-          if(Name && Phone) {
-            return item.Name.match(regName) && item.Phone.match(regPhone)
-          } else if (Name){
-            return item.Name.match(regName)
-          } else if (Phone){
-            return item.Phone.match(regPhone)
+          if(name && phone) {
+            return item.name.match(regName) && item.phone.match(regPhone)
+          } else if (name){
+            return item.name.match(regName)
+          } else if (phone){
+            return item.phone.match(regPhone)
           } else {
             return false
           }
@@ -50,7 +52,7 @@ const searchPhones = (Name, Phone, offset, limit) => {
 
         const dataLength = row.length
         const listData = row.splice(offset, limit)
-
+        console.log(dataLength, listData)
         resolve({dataLength, listData})
       }
       phoneReference.off("value");
@@ -61,15 +63,21 @@ const searchPhones = (Name, Phone, offset, limit) => {
   }))
 }
 
+
+
+
+
 //Create new instance
-const addPhones = (phone) => {
-  const referencePath = `/Phones/${phone.id}/`;
+const addPhones = (phone, url) => {
+  const referencePath = `/Phones/${phone.id}, stroageRef`;
   const phoneReference = firebase.database().ref(referencePath);
   return (new Promise((resolve, reject) => {
-    phoneReference.set({Name: phone.Name, Phone: phone.Phone}, (error) => {
+    phoneReference.set({name: phone.name, phone: phone.phone, avatar: url}, (error) => {
+      console.log(phoneReference)
       if (error) {
         reject("Data could not be deleted." + error);
       } else {
+        console.log('zzzzzzzz',phone)
         resolve(phone);
       }
     });
@@ -81,7 +89,7 @@ const updatePhone = (phone) => {
   var referencePath = `/Phones/${phone.id}/`;
   var userReference = firebase.database().ref(referencePath);
   return (new Promise((resolve, reject) => {
-    userReference.update({Name: phone.Name, Phone: phone.Phone}, (error) => {
+    userReference.update({name: phone.name, phone: phone.phone}, (error) => {
       if (error) {
         reject("Data could not be deleted." + error);
       } else {
@@ -105,5 +113,7 @@ const deletePhone = (phone) => {
     })
   }));
 }
+
+
 
 module.exports = {getPhones, addPhones, updatePhone, deletePhone , searchPhones}

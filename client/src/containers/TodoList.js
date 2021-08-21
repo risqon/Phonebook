@@ -7,6 +7,7 @@ import { connect } from 'react-redux'
 
 
 class TodoList extends Component {
+  
 
     componentDidMount() {
         this.props.loadPhoneFromMap();
@@ -22,9 +23,10 @@ class TodoList extends Component {
                     id={item.id}
                     index={this.props.stateFromMaps.offset + index +1}
                     sent={item.sent}
-                    Name={item.Name}
-                    Phone={item.Phone}
-                    edit={item.isEdit} />
+                    name={item.name}
+                    phone={item.phone}
+                    edit={item.isEdit} 
+                    avatar={item.avatar}/>
                 )
                 :
                 (
@@ -33,9 +35,10 @@ class TodoList extends Component {
                         id={item.id}
                         index={this.props.stateFromMaps.offset + index +1}
                         sent={item.sent}
-                        Name={item.Name}
-                        Phone={item.Phone}
+                        name={item.name}
+                        phone={item.phone}
                         edit={item.isEdit}
+                        avatar={item.avatar}
                     />)
         })
 
@@ -46,7 +49,7 @@ class TodoList extends Component {
                     <thead className="thead-dark">
                         <tr>
                             <th scope="col">#</th>
-                            <th scope="col">Pict</th>
+                            <th scope="col">Avatar</th>
                             <th scope="col">Name</th>
                             <th scope="col">Phone</th>
                             <th scope="col">Action</th>

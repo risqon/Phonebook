@@ -38,3 +38,14 @@ mutation {
     }
   }
 }
+
+{
+  phones(pagination:{offset: 0, limit: 9} Name: "zeni", Phone: ""){
+    totalData
+    items{
+      id
+      Name
+      Phone
+    }
+  }
+}

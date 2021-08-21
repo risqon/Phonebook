@@ -9,7 +9,7 @@ const client = new ApolloClient({
 
 
 // start load phone data
-export const loadPhoneSuccess = ({totalData, items}) => ({
+export const loadPhoneSuccess = ({ totalData, items }) => ({
     type: 'LOAD_PHONE_SUCCESS',
     totalData,
     items
@@ -25,9 +25,10 @@ export const loadPhone = (offset = 0, limit = 3) => {
         phones(pagination:{offset: ${offset}, limit:${limit}}){
             totalData
             items{
-                id,
-                Name
-                Phone
+                id
+                name
+                phone
+                avatar
             }
         }
     }`
@@ -35,7 +36,7 @@ export const loadPhone = (offset = 0, limit = 3) => {
         return client.query({
             query: usersQuery,
         }).then(function (response) {
-            console.log(response.data)
+           // console.log('load', response.data)
             dispatch(loadPhoneSuccess(response.data.phones))
         }).catch(function (error) {
             console.error(error);
@@ -57,18 +58,18 @@ export const cancelSearch = () => ({
     type: "MODE_SEARCH_INACTIVE",
 })
 
-export const searchPhones = (Name, Phone, offset = 0, limit = 3) => {
+export const searchPhones = (name, phone, offset = 0, limit = 3) => {
     const searchQuery = gql`
     query phones($Name:String,$Phone:String,$offset:Int,$limit:Int){
-        phones(Name:$Name,Phone:$Phone,pagination:{
+        phones(name:$name,phone:$phone,pagination:{
             offset:$offset,
             limit:$limit
         }) {
             totalData
             items{
                 id
-                Name
-                Phone
+                name
+                phone
             }
         }
     }`
@@ -76,8 +77,8 @@ export const searchPhones = (Name, Phone, offset = 0, limit = 3) => {
         return client.query({
             query: searchQuery,
             variables: {
-                Name,
-                Phone,
+                name,
+                phone,
                 offset,
                 limit
             }
@@ -104,33 +105,45 @@ export const postPhoneFailure = (id) => ({
     type: 'POST_PHONE_FAILURE', id
 })
 
-export const postPhoneRedux = (id, Name, Phone) => ({
-    type: 'POST_PHONE', id, Name, Phone
+export const postPhoneRedux = (id, name, phone, avatar) => ({
+    type: 'POST_PHONE',
+    id,
+    name,
+    phone,
+    avatar
 })
 
- 
-export const postPhone = (Name, Phone) => {
+
+export const postPhone = (name, phone, avatar) => {
     let id = Date.now();
+    console.log('wkwkwk', avatar)
     const addQuery = gql`
-    mutation addContact($Name: String!, $Phone: String!,$id:ID!) {
-        addContact(Name: $Name, Phone: $Phone,id:$id) {
-            Name
-            Phone
+    mutation addContact($name: String!, $phone: String!, $id:ID!, $avatar: String!) {
+        addContact(name: $name, phone: $phone, id:$id, avatar:$avatar) {
+            name
+            phone
             id
+            avatar
         }
     }`
+
     return dispatch => {
-        dispatch(postPhoneRedux(id, Name, Phone))
-        return client.mutate({ 
+        dispatch(postPhoneRedux(
+            id,
+            name,
+            phone,
+            avatar))
+        return client.mutate({
             mutation: addQuery,
             variables: {
-                Name,
-                Phone,
-                id
+                name,
+                phone,
+                id,
+                avatar
             }
         })
             .then(function (response) {
-                console.log(response)
+                console.log('add', response)
                 dispatch(postPhoneSuccess(response.data.addContact))
             })
             .catch(function (error) {
@@ -193,21 +206,23 @@ export const resendChatSuccess = (id) => ({
 })
 
 
-export const resendPhone = (id, Name, Phone) => {
+export const resendPhone = (id, name, phone, avatar) => {
     const addQuery = gql`
-    mutation addContact($Phone: String!, $Name: String!, $id:ID!){
-        addContact(Phone: $Phone, Name: $Name, id: $id){
-            Phone
-            Name
+    mutation addContact($name: String!, $phone: String!,$id:ID!, $avatar: String!){
+        addContact(name: $name, phone: $phone,id:$id, avatar: $avatar){
+            phone
+            name
+            avatar
         }
     }`
     return dispatch => {
         return client.mutate({
             mutation: addQuery,
             variables: {
-                Phone,
-                Name,
-                id
+                phone,
+                name,
+                id,
+                avatar
             }
         })
             .then(function (response) {
@@ -269,35 +284,37 @@ export const updatePhoneSuccess = (phone) => ({
 
 export const updatePhoneFailure = (id) => ({
     type: 'UPDATE_PHONE_FAILURE',
-     id
+    id
 })
 
 export const updatePhoneRedux = (id, Name, Phone) => ({
     type: 'UPDATE_PHONE',
-     id, 
-     Name, 
-     Phone
+    id,
+    Name,
+    Phone
 })
 
 
-export const editUpdatePhone = (id, Name, Phone) => {
+export const editUpdatePhone = (id, name, phone, avatar) => {
     const updateQuery = gql`
-    mutation updateContact($Phone: String!, $Name: String!, $id: ID!){
-        updateContact(Phone: $Phone, Name:$Name, id:$id){
-            Phone
-            Name
+    mutation updateContact($name: String!, $phone: String!,$id:ID!, $avatar: String!){
+        updateContact(name: $name, phone: $phone,id:$id, avatar: $avatar){
+            phone
+            name
             id
+            avatar
         }
     }`
 
     return dispatch => {
-        dispatch(updatePhoneRedux(id, Name, Phone))
+        dispatch(updatePhoneRedux(id, name, phone, avatar))
         return client.mutate({
             mutation: updateQuery,
-            variables:{
-                Phone,
-                Name,
-                id
+            variables: {
+                phone,
+                name,
+                id,
+                avatar
             }
         })
             .then(function (response) {

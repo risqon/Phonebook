@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 const firebase = require("firebase");
 
+
 /* GET home page. */
 router.get('/', function (req, res) {
   const phoneReference = firebase.database().ref("/Phones/");
@@ -18,18 +19,31 @@ router.get('/', function (req, res) {
 });
 
 //Create new instance
-router.post('/', function (req, res) {
-  const Phone = req.body.Phone;
-  const Name = req.body.Name;
+// let storageRef = firebase.storage().ref(`avatar`).getDownloadURL();
+// console.log('aaa',storageRef)
+// storageRef.child('avatar').getDownloadURL().then(url => {
+//   var xhr = new XMLHttpRequest();
+//   xhr.responseType = 'blob';
+//   xhr.onload = function(event) {
+//     var blob = xhr.response;
+//   };
+//   xhr.open('GET', url);
+//   xhr.send();
+// }).catch (function(error){
+//   console.log(error)
+// })
+
+router.post('/' , function (req, res) {
+  const { name , phone, avatar} = req.body
   const id = Date.now()
 
   const referencePath = `/Phones/${id}/`;
   const phoneReference = firebase.database().ref(referencePath);
-  phoneReference.set({ Name, Phone }, function (error) {
+  phoneReference.set({ name, phone, avatar }, function (error) {
     if (error) {
       res.send("Data could not be saved." + error);
     } else {
-      res.send(`${Name}'s phone number saved successfully.`);
+      res.send(`${name}'s phone number saved successfully.`);
     }
   });
 });
@@ -37,12 +51,12 @@ router.post('/', function (req, res) {
 //Update existing instance
 router.put('/:id', function (req, res) {
   const id = req.params.id;
-  const Name = req.body.Name;
-  const Phone = req.body.Phone;
+  const name = req.body.name;
+  const phone = req.body.phone;
 
   const referencePath = `/Phones/${id}/`;
   const phoneReference = firebase.database().ref(referencePath);
-  phoneReference.update({ Name, Phone}, function (error) {
+  phoneReference.update({ name, phone}, function (error) {
     if (error) {
       res.send("Data could not be updated." + error);
     } else {

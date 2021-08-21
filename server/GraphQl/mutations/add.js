@@ -8,12 +8,16 @@ exports.add = {
         id: {
             type: new GraphQLNonNull(GraphQLID)
         },
-        Name: {
+        name: {
             type: new GraphQLNonNull(GraphQLString),
         },
-        Phone: {
+        phone: {
             type: new GraphQLNonNull(GraphQLString),
+        },
+        avatar: {
+            type: GraphQLString
         }
+
     },
     resolve(root, params) {
         return services.addPhones(params);
