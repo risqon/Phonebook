@@ -9,8 +9,8 @@ class TodoEdit extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            name: this.props.name, 
-            phone: this.props.phone 
+            name: this.props.name,
+            phone: this.props.phone
         }
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -18,15 +18,14 @@ class TodoEdit extends React.Component {
     }
 
     handleChange(event) {
-        this.setState({[event.target.name] : event.target.value})
+        this.setState({ [event.target.name]: event.target.value })
     }
 
 
     handleSubmit(event) {
         this.props.update(
-        this.state.name, 
-        this.state.phone,
-        this.state.avatar);
+            this.state.name,
+            this.state.phone);
         event.preventDefault();
     }
 
@@ -41,13 +40,18 @@ class TodoEdit extends React.Component {
                     {this.props.index}
                 </td>
                 <td>
+                    <div>
+                        <img className="img" src={this.state.image || 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png'} style={{ width: 100, height: 100, borderRadius: 50 }} alt="pict" />
+                    </div>
+                </td>
+                <td>
                     <div className=" form-row" onSubmit={this.handleSubmit}>
                         <input name="name" type="text" className="form-control" value={this.state.name} onChange={this.handleChange} required={true} />
                     </div>
                 </td>
                 <td>
                     <div className=" form-row" onSubmit={this.handleSubmit}>
-                        <input name="phone" type="text" className="form-control" value={this.state.phone} onChange={this.handleChange} required={true}/>
+                        <input name="phone" type="text" className="form-control" value={this.state.phone} onChange={this.handleChange} required={true} />
                     </div>
                 </td>
                 <td>
@@ -62,10 +66,10 @@ class TodoEdit extends React.Component {
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
     cancelEdit: () => dispatch(clickCancelEditAct(ownProps.id)),
-    update: (name, phone, avatar) => dispatch(editUpdatePhone(ownProps.id, name, phone, avatar))
-  })
-  
-  export default connect(
+    update: (name, phone) => dispatch(editUpdatePhone(ownProps.id, name, phone))
+})
+
+export default connect(
     null,
     mapDispatchToProps
-  )(TodoEdit)
+)(TodoEdit)

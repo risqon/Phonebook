@@ -13,9 +13,6 @@ exports.updateContact = {
     phone: {
       type: new GraphQLNonNull(GraphQLString),
     },
-    avatar: {
-      type: GraphQLString
-    } 
   },
   resolve(root, params) {
     return services.updatePhone(params)

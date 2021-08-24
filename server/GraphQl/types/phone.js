@@ -16,7 +16,7 @@ exports.phoneType = new GraphQLObjectType({
       phone: {
         type: GraphQLString
       },
-      avatar: {
+      image: {
         type: GraphQLString
       }
     }

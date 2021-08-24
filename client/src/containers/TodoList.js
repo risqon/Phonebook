@@ -26,7 +26,7 @@ class TodoList extends Component {
                     name={item.name}
                     phone={item.phone}
                     edit={item.isEdit} 
-                    avatar={item.avatar}/>
+                    image={item.image}/>
                 )
                 :
                 (
@@ -38,7 +38,7 @@ class TodoList extends Component {
                         name={item.name}
                         phone={item.phone}
                         edit={item.isEdit}
-                        avatar={item.avatar}
+                        image={item.image}
                     />)
         })
 

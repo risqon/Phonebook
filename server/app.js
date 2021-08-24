@@ -1,10 +1,11 @@
+require('dotenv').config()
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-const bodyParser = require('body-parser');
 const { graphqlHTTP } = require("express-graphql");
 const cors = require("cors");
+
 const firebase = require("firebase/app")
 require("firebase/storage")
 
@@ -20,10 +21,6 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
-
-const storage = firebase.storage();
-
-//exports{ storage, firebase as default };
 
 var indexRouter = require('./routes/index');
 

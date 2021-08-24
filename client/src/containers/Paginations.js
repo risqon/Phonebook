@@ -81,7 +81,7 @@ const mapStateToProps = ({ phones }) => ({
 
 const mapDispatchToProps = dispatch => ({
    loadPhone: (offset) => dispatch(loadPhone(offset)),
-   searchPhones: (name, phone, offset, avatar) => (dispatch(searchPhones(name, phone, avatar, offset))),
+   searchPhones: (name, phone, offset, image) => (dispatch(searchPhones(name, phone, image, offset))),
    clickNextPage: (offset ) => dispatch(nextPage(offset)),
    clickPrevPage: (offset) => dispatch(previousPage(offset)),
    switchPage: (offset, switchToPage) => dispatch(switchPage(offset, switchToPage))

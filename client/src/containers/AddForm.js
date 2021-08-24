@@ -3,21 +3,21 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBan, faSave } from '@fortawesome/free-solid-svg-icons'
 import { postPhone, TogleButtonCta } from '../actions'
 import { connect } from 'react-redux'
-import { storage } from '../config/fairebase'
+import FileUploader from "react-firebase-file-uploader";
+import firebase from '../config/fairebase'
+import CustomUploadButton from 'react-firebase-file-uploader/lib/CustomUploadButton';
 import './addForm.css'
 
 class AddForm extends React.Component {
     constructor(props) {
         super(props);
+
         this.state = {
             name: '',
             phone: '',
-            url: '',
-            progress: 0,
-            avatar: null,
-            isUpload: false,
-            profileImg : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png'
-
+            image: "",
+            avatar: "",
+            profileImg: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png'
 
         };
         this.handleChange = this.handleChange.bind(this);
@@ -27,11 +27,11 @@ class AddForm extends React.Component {
         this.handleClick = this.handleClick.bind(this);
     }
 
- 
     handleChange = e => {
+        e.preventDefault()
         const reader = new FileReader();
         reader.onload = () => {
-            if(reader.readyState === 2){
+            if (reader.readyState === 2) {
                 this.setState({
                     profileImg: reader.result,
                     isUpload: true
@@ -39,32 +39,11 @@ class AddForm extends React.Component {
             }
         }
         reader.readAsDataURL(e.target.files[0])
-        if (e.target.files[0]) {
-            const avatar = e.target.files[0];
-            //console.log('avatar', avatar)
-            this.setState(() => ({ avatar }))
-        }
-    }
 
-    handleUpload = () => {
-        const { avatar } = this.state;
-        const uploadTask = storage.ref(`avatars/${avatar.name}`).put(avatar);
-        console.log('wkwkw', uploadTask)
-        uploadTask.on('state_changed',
-            (snapshot) => {
-                const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-                this.setState({ progress });
-            },
-            (error) => {
-                console.log(error);
-            },
-            // () => {
-            //     storage.ref('avatars').child(avatar.name).getDownloadURL().then(url => {
-            //         console.log('download', url);
-            //         this.setState({ url })
-            //     })
-            // }
-        )
+        if (e.target.files[0]) {
+            const image = e.target.files[0];
+            this.setState(() => ({ image }))
+        }
     }
 
     handleChangeName(event) {
@@ -75,22 +54,49 @@ class AddForm extends React.Component {
         this.setState({ phone: event.target.value });
     }
 
-    handleSubmit(event) {
-        if (this.state.name && this.state.phone && this.state.avatar) {
-            this.props.addPhone(this.state.name, this.state.phone, this.state.avatar)
-            this.setState({ name: "", phone: "", avatar: null })
-        }
-        event.preventDefault();
-    }
-
     handleClick(event) {
         event.preventDefault()
         this.props.togleButtonCta()
     }
 
+    handleUploadError = error => {
+        this.setState({ isUploading: false });
+        console.error(error);
+    };
+
+    handleUploadSuccess = filename => {
+       
+        firebase
+            .storage()
+            .ref("images")
+            .child(filename)
+            .getDownloadURL()
+            .then(url => 
+                
+                this.setState({ 
+                    image: url
+                 }));
+    };
+
+    handleSubmit(event) {
+        event.preventDefault()
+        if (this.state.name &&
+            this.state.phone &&
+            this.state.image) {
+                console.log(this.state.image)
+            this.props.postPhone(this.state.name, this.state.phone, this.state.image)
+            this.setState({
+                name: "",
+                phone: "",
+                image: ""
+            })
+
+        }
+    }
+
 
     render() {
-        const {isUpload, progress, profileImg, url } = this.state
+        const { profileImg, progress } = this.state
         return (
             <div>
                 <button
@@ -108,24 +114,27 @@ class AddForm extends React.Component {
                             ADD NEW CONTACT
                         </div>
                         <div className="card-body">
+
+                            
+                            {/* pembatas */}
+                            <form onSubmit={this.handleSubmit} className="form-inline justify-content-center">
                             <div className="container">
                                 <div className="img-holder">
-                                    <img src={ url || profileImg} alt="" id="img" className="img" />
-                                    <br />
-                                    <progress value={progress} max="100" />
+                                    <img src={"" || profileImg} alt="" id="img" className="img" />
+                                    {/* <progress value={progress} max="100" /> */}
                                 </div>
-                                <input type="file" accept="image/*" name="image-upload" id="input" onChange={this.handleChange} />
                                 <div className="label">
-                                    {isUpload && <button onClick={this.handleUpload}>Upload</button>}
-                                    {!isUpload && <label className="image-upload" htmlFor="input">
-                                        Choose your Photo
-                                    </label>}
-
+                                    <FileUploader
+                                        accept="images/*"
+                                        name="image"
+                                        randomizeFilename
+                                        storageRef={firebase.storage().ref("images")}
+                                        onUploadError={this.handleUploadError}
+                                        onUploadSuccess={this.handleUploadSuccess}
+                                        onChange={this.handleChange}
+                                    /> 
                                 </div>
                             </div>
-
-                            {/* pembatas */}
-                            <form onSubmit={this.handleSubmit}className="form-inline justify-content-center">
                                 <div className="form-group row">
                                     <label htmlFor="Name" className="col-sm-2 col-form-label">Name</label>
                                     <div className="col-sm-10">
@@ -158,7 +167,7 @@ class AddForm extends React.Component {
 
 
 const mapDispatchToProps = dispatch => ({
-    addPhone: (name, phone, avatar) => dispatch(postPhone(name, phone, avatar)),
+    postPhone: (name, phone, image) => dispatch(postPhone(name, phone, image)),
     togleButtonCta: () => dispatch(TogleButtonCta())
 })
 

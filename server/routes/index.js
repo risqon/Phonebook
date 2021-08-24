@@ -2,14 +2,12 @@ var express = require('express');
 var router = express.Router();
 const firebase = require("firebase");
 
-
 /* GET home page. */
 router.get('/', function (req, res) {
   const phoneReference = firebase.database().ref("/Phones/");
-  console.log('here')
   //Attach an asynchronous callback to read the data
   phoneReference.on("value", function (snapshot) {
-    console.log('berhasil',snapshot.val());
+    console.log('berhasil', snapshot.val());
     res.json(snapshot.val());
     phoneReference.off("value");
   }, function (errorObject) {
@@ -19,27 +17,32 @@ router.get('/', function (req, res) {
 });
 
 //Create new instance
-// let storageRef = firebase.storage().ref(`avatar`).getDownloadURL();
-// console.log('aaa',storageRef)
-// storageRef.child('avatar').getDownloadURL().then(url => {
-//   var xhr = new XMLHttpRequest();
-//   xhr.responseType = 'blob';
-//   xhr.onload = function(event) {
-//     var blob = xhr.response;
-//   };
-//   xhr.open('GET', url);
-//   xhr.send();
-// }).catch (function(error){
-//   console.log(error)
-// })
+// const s3 = new AWS.S3({
+//     accessKeyId: process.env.AWS_ID,
+//     secretAccessKey: process.env.AWS_SECRET
+//   })
+//   // //console.log('s3', s3)
+//   var upload = multer({
+//     storage: multerS3({
+//       s3: s3,
+//       bucket: 'image-phonebook',
+//       acl: "public-read",
+//       metadata: function (req, file, cb) {
+//         console.log('fieldname');
+//         console.log(file);
+//         cb(null, {fieldName: file.fieldname});
+//       },
+//       key: function (req, file, cb) {
+//         cb(null, Date.now() + "-" + file.originalname)
+//       }
+//     })
+//   })
 
-router.post('/' , function (req, res) {
-  const { name , phone, avatar} = req.body
-  const id = Date.now()
 
+router.post('/', function (req, res) {  
   const referencePath = `/Phones/${id}/`;
   const phoneReference = firebase.database().ref(referencePath);
-  phoneReference.set({ name, phone, avatar }, function (error) {
+  phoneReference.set({ name, phone , image }, function (error) {
     if (error) {
       res.send("Data could not be saved." + error);
     } else {
@@ -56,7 +59,7 @@ router.put('/:id', function (req, res) {
 
   const referencePath = `/Phones/${id}/`;
   const phoneReference = firebase.database().ref(referencePath);
-  phoneReference.update({ name, phone}, function (error) {
+  phoneReference.update({ name, phone }, function (error) {
     if (error) {
       res.send("Data could not be updated." + error);
     } else {

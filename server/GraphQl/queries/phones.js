@@ -14,17 +14,17 @@ exports.queryType = new GraphQLObjectType({
         args: {
           name: { type: GraphQLString },
           phone: { type: GraphQLString },
-          avatar: { type: GraphQLString },
+          image: { type: GraphQLString },
           pagination: {
             type: PaginationArgType,
             defaultValue: { offset: 0, limit: 3 }
           },
         },
         resolve: async (root, args) => {
-          const { name, phone, avatar, pagination: { offset, limit } } = args
+          const { name, phone, image, pagination: { offset, limit } } = args
 
-          if (name || phone || avatar) {
-            const data = await searchPhones(name, phone, avatar, offset, limit)
+          if (name || phone || image) {
+            const data = await searchPhones(name, phone, image, offset, limit)
             return {
               items: data.listData,
               totalData: data.dataLength

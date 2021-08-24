@@ -14,9 +14,9 @@ exports.add = {
         phone: {
             type: new GraphQLNonNull(GraphQLString),
         },
-        avatar: {
-            type: GraphQLString
-        }
+        image: {
+            type: new GraphQLNonNull(GraphQLString)
+        },
 
     },
     resolve(root, params) {

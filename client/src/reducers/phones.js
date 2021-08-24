@@ -73,7 +73,7 @@ const phones = (state = globalState, action) => {
                         id: action.id,
                         name: action.name,
                         phone: action.phone,
-                        avatar: action.avatar,
+                        image: action.image,
                         sent: true,
                         isEdit: false
                     }
@@ -87,10 +87,10 @@ const phones = (state = globalState, action) => {
 
         case 'POST_PHONE_FAILURE':
             return {
-                ...state, phones: state.phones.map((item) => {
+                ...state, 
+                phones: state.phones.map((item) => {
                     if (item.id === action.id) {
                         item.sent = false;
-
                     }
                     return item
                 })
@@ -142,7 +142,6 @@ const phones = (state = globalState, action) => {
                     if (item.id === action.id) {
                         item.name = action.name
                         item.phone = action.phone
-                        item.avatar = action.avatar
                         item.isEdit = false
                     }
                     return item

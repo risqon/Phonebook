@@ -7,7 +7,6 @@ const client = new ApolloClient({
     uri: API_URL
 })
 
-
 // start load phone data
 export const loadPhoneSuccess = ({ totalData, items }) => ({
     type: 'LOAD_PHONE_SUCCESS',
@@ -28,7 +27,7 @@ export const loadPhone = (offset = 0, limit = 3) => {
                 id
                 name
                 phone
-                avatar
+                image
             }
         }
     }`
@@ -36,7 +35,7 @@ export const loadPhone = (offset = 0, limit = 3) => {
         return client.query({
             query: usersQuery,
         }).then(function (response) {
-           // console.log('load', response.data)
+            // console.log('load', response.data)
             dispatch(loadPhoneSuccess(response.data.phones))
         }).catch(function (error) {
             console.error(error);
@@ -58,7 +57,7 @@ export const cancelSearch = () => ({
     type: "MODE_SEARCH_INACTIVE",
 })
 
-export const searchPhones = (name, phone, offset = 0, limit = 3) => {
+export const searchPhones = (name, phone, image, offset = 0, limit = 3) => {
     const searchQuery = gql`
     query phones($Name:String,$Phone:String,$offset:Int,$limit:Int){
         phones(name:$name,phone:$phone,pagination:{
@@ -70,6 +69,7 @@ export const searchPhones = (name, phone, offset = 0, limit = 3) => {
                 id
                 name
                 phone
+                image
             }
         }
     }`
@@ -80,7 +80,8 @@ export const searchPhones = (name, phone, offset = 0, limit = 3) => {
                 name,
                 phone,
                 offset,
-                limit
+                limit,
+                image
             }
         })
             .then(response => {
@@ -105,41 +106,39 @@ export const postPhoneFailure = (id) => ({
     type: 'POST_PHONE_FAILURE', id
 })
 
-export const postPhoneRedux = (id, name, phone, avatar) => ({
+export const postPhoneRedux = (id, name, phone, image) => ({
     type: 'POST_PHONE',
     id,
     name,
     phone,
-    avatar
+    image
 })
 
 
-export const postPhone = (name, phone, avatar) => {
+export const postPhone = (name, phone, image) => {
     let id = Date.now();
-    console.log('wkwkwk', avatar)
     const addQuery = gql`
-    mutation addContact($name: String!, $phone: String!, $id:ID!, $avatar: String!) {
-        addContact(name: $name, phone: $phone, id:$id, avatar:$avatar) {
+    mutation addContact($name: String!, $phone: String!, $id:ID! $image: String!) {
+        addContact(name: $name, phone: $phone, id:$id, image: $image ) {
             name
             phone
             id
-            avatar
+            image
         }
     }`
-
     return dispatch => {
         dispatch(postPhoneRedux(
             id,
             name,
             phone,
-            avatar))
+            image))
         return client.mutate({
             mutation: addQuery,
             variables: {
                 name,
                 phone,
                 id,
-                avatar
+                image
             }
         })
             .then(function (response) {
@@ -147,7 +146,7 @@ export const postPhone = (name, phone, avatar) => {
                 dispatch(postPhoneSuccess(response.data.addContact))
             })
             .catch(function (error) {
-                console.error(error);
+                console.error('eror action',error);
                 dispatch(postPhoneFailure(id))
             });
     }
@@ -206,13 +205,13 @@ export const resendChatSuccess = (id) => ({
 })
 
 
-export const resendPhone = (id, name, phone, avatar) => {
+export const resendPhone = (id, name, phone, image) => {
     const addQuery = gql`
-    mutation addContact($name: String!, $phone: String!,$id:ID!, $avatar: String!){
-        addContact(name: $name, phone: $phone,id:$id, avatar: $avatar){
+    mutation addContact($name: String!, $phone: String!,$id:ID!, $image: String!){
+        addContact(name: $name, phone: $phone,id:$id, image: $image){
             phone
             name
-            avatar
+            image
         }
     }`
     return dispatch => {
@@ -222,14 +221,14 @@ export const resendPhone = (id, name, phone, avatar) => {
                 phone,
                 name,
                 id,
-                avatar
+                image
             }
         })
             .then(function (response) {
                 dispatch(resendChatSuccess(id))
             })
             .catch(function (error) {
-                console.error(error);
+                console.error('client',error);
                 dispatch(postPhoneFailure(id))
             });
     }
@@ -295,26 +294,25 @@ export const updatePhoneRedux = (id, Name, Phone) => ({
 })
 
 
-export const editUpdatePhone = (id, name, phone, avatar) => {
+export const editUpdatePhone = (id, name, phone) => {
     const updateQuery = gql`
-    mutation updateContact($name: String!, $phone: String!,$id:ID!, $avatar: String!){
-        updateContact(name: $name, phone: $phone,id:$id, avatar: $avatar){
+    mutation updateContact($name: String!, $phone: String!,$id:ID!){
+        updateContact(name: $name, phone: $phone,id:$id){
             phone
             name
             id
-            avatar
+            image
         }
     }`
 
     return dispatch => {
-        dispatch(updatePhoneRedux(id, name, phone, avatar))
+        dispatch(updatePhoneRedux(id, name, phone))
         return client.mutate({
             mutation: updateQuery,
             variables: {
                 phone,
                 name,
                 id,
-                avatar
             }
         })
             .then(function (response) {
