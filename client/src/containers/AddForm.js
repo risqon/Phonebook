@@ -3,9 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBan, faSave } from '@fortawesome/free-solid-svg-icons'
 import { postPhone, TogleButtonCta } from '../actions'
 import { connect } from 'react-redux'
-import FileUploader from "react-firebase-file-uploader";
-import firebase from '../config/fairebase'
-import CustomUploadButton from 'react-firebase-file-uploader/lib/CustomUploadButton';
+import { storage } from '../config/fairebase'
 import './addForm.css'
 
 class AddForm extends React.Component {
@@ -15,8 +13,10 @@ class AddForm extends React.Component {
         this.state = {
             name: '',
             phone: '',
-            image: "",
-            avatar: "",
+            url: '',
+            image: null,
+            progress: 0,
+            isUpload: false,
             profileImg: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png'
 
         };
@@ -26,6 +26,7 @@ class AddForm extends React.Component {
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleClick = this.handleClick.bind(this);
     }
+
 
     handleChange = e => {
         e.preventDefault()
@@ -46,6 +47,29 @@ class AddForm extends React.Component {
         }
     }
 
+    handleUpload = (e) => {
+        e.preventDefault()
+        const { image } = this.state;
+        const uploadTask = storage.ref(`images/${image.name}`).put(image);
+        console.log('wkwkw', uploadTask)
+        uploadTask.on('state_changed',
+            (snapshot) => {
+                const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+                this.setState({ progress });
+            },
+            (error) => {
+                console.log(error);
+            },
+            () => {
+                storage.ref('images').child(image.name).getDownloadURL().then(url => {
+                    console.log('download', url);
+                    let image = url
+                    this.setState({ image })
+                })
+            }
+        )
+    }
+
     handleChangeName(event) {
         this.setState({ name: event.target.value });
     }
@@ -54,49 +78,30 @@ class AddForm extends React.Component {
         this.setState({ phone: event.target.value });
     }
 
+    handleSubmit(event) {
+        event.preventDefault();
+        if (this.state.name &&
+            this.state.phone &&
+            this.state.image) {
+            this.props.postPhone(this.state.name, this.state.phone, this.state.image)
+            this.setState({
+                name: "",
+                phone: "",
+                image: "",
+                isUpload: false
+            })
+
+        }
+
+    }
+
     handleClick(event) {
         event.preventDefault()
         this.props.togleButtonCta()
     }
 
-    handleUploadError = error => {
-        this.setState({ isUploading: false });
-        console.error(error);
-    };
-
-    handleUploadSuccess = filename => {
-       
-        firebase
-            .storage()
-            .ref("images")
-            .child(filename)
-            .getDownloadURL()
-            .then(url => 
-                
-                this.setState({ 
-                    image: url
-                 }));
-    };
-
-    handleSubmit(event) {
-        event.preventDefault()
-        if (this.state.name &&
-            this.state.phone &&
-            this.state.image) {
-                console.log(this.state.image)
-            this.props.postPhone(this.state.name, this.state.phone, this.state.image)
-            this.setState({
-                name: "",
-                phone: "",
-                image: ""
-            })
-
-        }
-    }
-
-
     render() {
-        const { profileImg, progress } = this.state
+        const { profileImg, url, isUpload, progress } = this.state
         return (
             <div>
                 <button
@@ -114,27 +119,31 @@ class AddForm extends React.Component {
                             ADD NEW CONTACT
                         </div>
                         <div className="card-body">
-
-                            
-                            {/* pembatas */}
-                            <form onSubmit={this.handleSubmit} className="form-inline justify-content-center">
                             <div className="container">
-                                <div className="img-holder">
-                                    <img src={"" || profileImg} alt="" id="img" className="img" />
-                                    {/* <progress value={progress} max="100" /> */}
-                                </div>
+
+                                {isUpload ?
+                                    <div className="img-holder">
+                                        <img src={url || profileImg} alt="" id="img" className="img" />
+                                        <progress value={progress} max="100" />
+                                    </div>
+                                    :
+                                    <div className="img-holder">
+                                        <img src={'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png'} alt="" id="img" className="img" />
+                                        <progress value={0} max="100" />
+                                    </div>
+                                }
+
+
+
+                                <input type="file" accept="image/*" name="image-upload" id="input" onChange={this.handleChange} />
                                 <div className="label">
-                                    <FileUploader
-                                        accept="images/*"
-                                        name="image"
-                                        randomizeFilename
-                                        storageRef={firebase.storage().ref("images")}
-                                        onUploadError={this.handleUploadError}
-                                        onUploadSuccess={this.handleUploadSuccess}
-                                        onChange={this.handleChange}
-                                    /> 
+                                    {!isUpload ? <label className="image-upload" htmlFor="input">
+                                        Choose your Photo
+                                    </label> : <button className="image-upload" onClick={this.handleUpload}>upload</button>}
                                 </div>
                             </div>
+                            {/* pembatas */}
+                            <form onSubmit={this.handleSubmit} className="form-inline justify-content-center">
                                 <div className="form-group row">
                                     <label htmlFor="Name" className="col-sm-2 col-form-label">Name</label>
                                     <div className="col-sm-10">

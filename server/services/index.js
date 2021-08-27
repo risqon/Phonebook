@@ -23,7 +23,7 @@ const getPhones = (offset, limit) => {
 }
 
 //search existing instance
-const searchPhones = (name, phone, offset, limit) => {
+const searchPhones = (name, phone, image, offset, limit) => {
   const regName = new RegExp(name, 'ig')
   const regPhone = new RegExp(phone, 'g')
   const phoneReference = firebase.database().ref("/Phones/");
@@ -34,7 +34,7 @@ const searchPhones = (name, phone, offset, limit) => {
         resolve([]);
       } else {
         const row = Object.keys(folders).map(o => Object.assign({ id: o }, folders[o])).filter(item => {
-          if (name && phone) {
+          if (name && phone && image) {
             return item.name.match(regName) && item.phone.match(regPhone)
           } else if (name) {
             return item.name.match(regName)
@@ -46,7 +46,7 @@ const searchPhones = (name, phone, offset, limit) => {
         })
         const dataLength = row.length
         const listData = row.splice(offset, limit)
-        console.log(dataLength, listData)
+       // console.log(dataLength, listData)
         resolve({ dataLength, listData })
       }
       phoneReference.off("value");

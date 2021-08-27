@@ -23,10 +23,10 @@ class TodoEdit extends React.Component {
 
 
     handleSubmit(event) {
+        event.preventDefault();
         this.props.update(
             this.state.name,
             this.state.phone);
-        event.preventDefault();
     }
 
     handleCancel() {

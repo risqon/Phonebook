@@ -7,7 +7,8 @@ class SearchForm extends Component {
         super(props)
         this.state = {
             name: "",
-            phone: ""
+            phone: "",
+            image: ""
         }
         this.handlePhoneChange = this.handlePhoneChange.bind(this);
         this.handleNameChange = this.handleNameChange.bind(this);
@@ -46,13 +47,13 @@ class SearchForm extends Component {
                         <div className="form-group row">
                             <label htmlFor="Phone" className="col-sm-2 col-form-label">Name</label>
                             <div className="col-sm-10">
-                                <input type="text" className="form-control" id="names" name="names" value={this.state.name} onChange={this.handleNameChange} placeholder="Search Name" />
+                                <input type="text" className="form-control" id="name" name="name" value={this.state.name} onChange={this.handleNameChange} placeholder="Search Name" />
                             </div>
                         </div>
                         <div className="form-group row">
                             <label htmlFor="Name" className="col-sm-2 col-form-label">Number</label>
                             <div className="col-sm-10">
-                                <input type="text" className="form-control" id="phones" name="phones" value={this.state.phone} onChange={this.handlePhoneChange} placeholder="Search Phone Number" />
+                                <input type="text" className="form-control" id="phone" name="phone" value={this.state.phone} onChange={this.handlePhoneChange} placeholder="Search Phone Number" />
                             </div>
                             
                         </div>
@@ -73,7 +74,7 @@ class SearchForm extends Component {
 
 const mapDispatchToProps = dispatch => ({
     postPhone: (phone, name, id, image) => dispatch(postPhone(phone, name, id, image)),
-    searchPhones: (name, phone) => dispatch(searchPhones(name, phone)),
+    searchPhones: (name, phone, image) => dispatch(searchPhones(name, phone, image)),
     searchMode: (filter) => dispatch(searchMode(filter)),
     loadPhone: () => dispatch(loadPhone()),
     cancelSearch:()=>dispatch(cancelSearch())

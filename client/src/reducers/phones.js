@@ -7,7 +7,8 @@ let globalState = {
     currentPage: 1,
     isSearchModeOn: false,
     filterName: '',
-    filterPhone: ''
+    filterPhone: '',
+    filterImage: ""
 }
 
 const phones = (state = globalState, action) => {
@@ -32,7 +33,8 @@ const phones = (state = globalState, action) => {
                 ...state,
                 isSearchModeOn: true,
                 filterName: action.filter.name,
-                filterPhone: action.filter.phone
+                filterPhone: action.filter.phone,
+                filterImage: action.filter.image
             }
 
         case 'MODE_SEARCH_INACTIVE':
@@ -40,7 +42,8 @@ const phones = (state = globalState, action) => {
                 ...state,
                 isSearchModeOn: false,
                 filterName: "",
-                filterPhone: ""
+                filterPhone: "",
+                filterImage: ""
             }
 
 

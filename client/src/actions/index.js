@@ -59,8 +59,8 @@ export const cancelSearch = () => ({
 
 export const searchPhones = (name, phone, image, offset = 0, limit = 3) => {
     const searchQuery = gql`
-    query phones($Name:String,$Phone:String,$offset:Int,$limit:Int){
-        phones(name:$name,phone:$phone,pagination:{
+    query phones($name:String,$phone:String,$offset:Int,$limit:Int , $image: String){
+        phones(name:$name,phone:$phone , image: $image,pagination:{
             offset:$offset,
             limit:$limit
         }) {
