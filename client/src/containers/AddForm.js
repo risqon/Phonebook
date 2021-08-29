@@ -3,7 +3,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBan, faSave } from '@fortawesome/free-solid-svg-icons'
 import { postPhone, TogleButtonCta } from '../actions'
 import { connect } from 'react-redux'
-import { storage } from '../config/fairebase'
+import firebase from '../config/fairebase'
+import CustomUploadButton from 'react-firebase-file-uploader/lib/CustomUploadButton';
 import './addForm.css'
 
 class AddForm extends React.Component {
@@ -13,14 +14,14 @@ class AddForm extends React.Component {
         this.state = {
             name: '',
             phone: '',
-            url: '',
             image: null,
             progress: 0,
             isUpload: false,
+            isUploading: false,
             profileImg: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png'
 
         };
-        this.handleChange = this.handleChange.bind(this);
+        // this.handleChange = this.handleChange.bind(this);
         this.handleChangeName = this.handleChangeName.bind(this);
         this.handleChangePhone = this.handleChangePhone.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -28,47 +29,73 @@ class AddForm extends React.Component {
     }
 
 
-    handleChange = e => {
-        e.preventDefault()
-        const reader = new FileReader();
-        reader.onload = () => {
-            if (reader.readyState === 2) {
-                this.setState({
-                    profileImg: reader.result,
-                    isUpload: true
-                })
-            }
-        }
-        reader.readAsDataURL(e.target.files[0])
+    // handleChange = e => {
+    //     e.preventDefault()
+    //     const reader = new FileReader();
+    //     reader.onload = () => {
+    //         if (reader.readyState === 2) {
+    //             this.setState({
+    //                 profileImg: reader.result,
+    //                 isUpload: true
+    //             })
+    //         }
+    //     }
+    //     reader.readAsDataURL(e.target.files[0])
 
-        if (e.target.files[0]) {
-            const image = e.target.files[0];
-            this.setState(() => ({ image }))
-        }
-    }
+    //     if (e.target.files[0]) {
+    //         const image = e.target.files[0];
+    //         this.setState(() => ({ image }))
+    //     }
+    // }
 
-    handleUpload = (e) => {
-        e.preventDefault()
-        const { image } = this.state;
-        const uploadTask = storage.ref(`images/${image.name}`).put(image);
-        console.log('wkwkw', uploadTask)
-        uploadTask.on('state_changed',
-            (snapshot) => {
-                const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-                this.setState({ progress });
-            },
-            (error) => {
-                console.log(error);
-            },
-            () => {
-                storage.ref('images').child(image.name).getDownloadURL().then(url => {
-                    console.log('download', url);
-                    let image = url
-                    this.setState({ image })
-                })
-            }
-        )
-    }
+    // handleUpload = (e) => {
+    //     e.preventDefault()
+    //     const { image } = this.state;
+    //     const uploadTask = storage.ref(`images/${image.name}`).put(image);
+    //     console.log('wkwkw', uploadTask)
+    //     uploadTask.on('state_changed',
+    //         (snapshot) => {
+    //             const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+    //             this.setState({ progress });
+    //         },
+    //         (error) => {
+    //             console.log(error);
+    //         },
+    //         () => {
+    //             storage.ref('images').child(image.name).getDownloadURL().then(url => {
+    //                 console.log('download', url);
+    //                 let image = url
+    //                 this.setState({ image })
+    //             })
+    //         }
+    //     )
+    // }
+
+    handleUploadStart = () => this.setState({ isUploading: true, progress: 0 });
+    
+    handleProgress = (snapshot) => {
+        const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100 );
+        this.setState({ progress });
+    } 
+    handleUploadError = error => {
+        this.setState({ isUploading: false });
+        console.error(error);
+    };
+
+    handleUploadSuccess = filename => {
+        this.setState({
+            avatar: filename,
+            progress: 100,
+            isUploading: false,
+            isUpload: true,
+        });
+        firebase
+            .storage()
+            .ref("images")
+            .child(filename)
+            .getDownloadURL()
+            .then(url => this.setState({ image: url }));
+    };
 
     handleChangeName(event) {
         this.setState({ name: event.target.value });
@@ -78,7 +105,7 @@ class AddForm extends React.Component {
         this.setState({ phone: event.target.value });
     }
 
-    handleSubmit(event) {
+    handleSubmit = (event) => {
         event.preventDefault();
         if (this.state.name &&
             this.state.phone &&
@@ -88,11 +115,9 @@ class AddForm extends React.Component {
                 name: "",
                 phone: "",
                 image: "",
-                isUpload: false
+                isUpload: false,
             })
-
         }
-
     }
 
     handleClick(event) {
@@ -101,7 +126,7 @@ class AddForm extends React.Component {
     }
 
     render() {
-        const { profileImg, url, isUpload, progress } = this.state
+        const { image, isUpload, progress, profileImg } = this.state
         return (
             <div>
                 <button
@@ -120,27 +145,36 @@ class AddForm extends React.Component {
                         </div>
                         <div className="card-body">
                             <div className="container">
-
                                 {isUpload ?
                                     <div className="img-holder">
-                                        <img src={url || profileImg} alt="" id="img" className="img" />
+                                        <img src={image || profileImg } alt="" id="img" className="img" />
                                         <progress value={progress} max="100" />
                                     </div>
                                     :
                                     <div className="img-holder">
-                                        <img src={'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png'} alt="" id="img" className="img" />
+                                        <img src={profileImg} alt="" id="img" className="img" />
                                         <progress value={0} max="100" />
                                     </div>
                                 }
-
-
-
-                                <input type="file" accept="image/*" name="image-upload" id="input" onChange={this.handleChange} />
+                                <div className="label">
+                                    <CustomUploadButton
+                                        accept="image/*"
+                                        name="avatar"
+                                        randomizeFilename
+                                        storageRef={firebase.storage().ref("images")}
+                                        onUploadStart={this.handleUploadStart}
+                                        onUploadError={this.handleUploadError}
+                                        onUploadSuccess={this.handleUploadSuccess}
+                                        onProgress={this.handleProgress}
+                                        className="image-upload"
+                                    > Choose your Photo </CustomUploadButton>
+                                </div>
+                                {/* <input type="file" accept="image/*" name="image-upload" id="input" onChange={this.handleChange} />
                                 <div className="label">
                                     {!isUpload ? <label className="image-upload" htmlFor="input">
                                         Choose your Photo
                                     </label> : <button className="image-upload" onClick={this.handleUpload}>upload</button>}
-                                </div>
+                                </div> */}
                             </div>
                             {/* pembatas */}
                             <form onSubmit={this.handleSubmit} className="form-inline justify-content-center">
@@ -156,14 +190,12 @@ class AddForm extends React.Component {
                                         <input type="text" className="form-control" id="phone" name="phone" value={this.state.phone} onChange={this.handleChangePhone} placeholder="Phone Number" />
                                     </div>
                                 </div>
-
                                 <div className="form-group row align-self-center">
                                     <div className="col-sm-12">
                                         <button type="button" className="btn btn-warning  btn-cancel float-right addc ml-2" onClick={this.handleClick}><FontAwesomeIcon icon={faBan} /> Cancel </button>
                                         <button type="submit" className="btn btn-primary  btn-add float-right addc"><FontAwesomeIcon icon={faSave} /> Save</button>
                                     </div>
                                 </div>
-
                             </form>
                         </div>
                     </div>

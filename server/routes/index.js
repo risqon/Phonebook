@@ -16,29 +16,6 @@ router.get('/', function (req, res) {
   });
 });
 
-//Create new instance
-// const s3 = new AWS.S3({
-//     accessKeyId: process.env.AWS_ID,
-//     secretAccessKey: process.env.AWS_SECRET
-//   })
-//   // //console.log('s3', s3)
-//   var upload = multer({
-//     storage: multerS3({
-//       s3: s3,
-//       bucket: 'image-phonebook',
-//       acl: "public-read",
-//       metadata: function (req, file, cb) {
-//         console.log('fieldname');
-//         console.log(file);
-//         cb(null, {fieldName: file.fieldname});
-//       },
-//       key: function (req, file, cb) {
-//         cb(null, Date.now() + "-" + file.originalname)
-//       }
-//     })
-//   })
-
-
 router.post('/', function (req, res) {  
   const referencePath = `/Phones/${id}/`;
   const phoneReference = firebase.database().ref(referencePath);
